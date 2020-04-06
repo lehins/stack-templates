@@ -1,0 +1,272 @@
+{-# START_FILE {{name}}.cabal #-}
+name:                {{name}}
+version:             0.1.0.0
+synopsis:            Short description
+description:         Please see the README on GitHub at <https://github.com/lehins/{{name}}#readme>
+homepage:            https://github.com/lehins/{{name}}
+license:             BSD3
+license-file:        LICENSE
+author:              Alexey Kuleshevich
+maintainer:          alexey@kuleshevi.ch
+copyright:           {{year}}{{^year}}2020{{/year}} Alexey Kuleshevich
+category:            Algorithms
+build-type:          Custom
+extra-source-files:  README.md
+                   , CHANGELOG.md
+cabal-version:       1.18
+tested-with:         GHC == 8.4.3
+                   , GHC == 8.4.4
+                   , GHC == 8.6.3
+                   , GHC == 8.6.4
+                   , GHC == 8.6.5
+                   , GHC == 8.8.1
+                   , GHC == 8.8.2
+                   , GHC == 8.10.1
+custom-setup
+  setup-depends:
+      base
+    , Cabal
+    , cabal-doctest >=1.0.6
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Lib
+
+  other-modules:
+  build-depends:       base >= 4.8 && < 5
+
+  default-language:    Haskell2010
+  ghc-options:         -Wall
+                       -Wincomplete-record-updates
+                       -Wincomplete-uni-patterns
+                       -Wredundant-constraints
+
+
+executable {{name}}
+  main-is: Main.hs
+  other-modules:
+      Paths_{{name-as-varid}}
+  hs-source-dirs:     app
+  ghc-options:        -Wall
+                      -Wincomplete-record-updates
+                      -Wincomplete-uni-patterns
+                      -Wredundant-constraints
+                      -O2
+                      -threaded
+                      -rtsopts
+                      -with-rtsopts=-N
+  build-depends:      base
+                    , {{name}}
+  default-language: Haskell2010
+
+test-suite doctests
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   tests
+  main-is:          doctests.hs
+  build-depends: base
+               , doctest >=0.15
+               , {{name}}
+               , template-haskell
+  default-language:    Haskell2010
+  ghc-options:        -Wall
+                      -Wincomplete-record-updates
+                      -Wincomplete-uni-patterns
+                      -Wredundant-constraints
+                      -fno-warn-orphans
+                      -threaded
+
+test-suite tests
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     tests
+  main-is:            Main.hs
+  other-modules:      Common
+                    , LibSpec
+                    , Spec
+  build-depends:      base             >= 4.8 && < 5
+                    , {{name}}
+                    , hspec
+                    , QuickCheck
+
+  default-language:   Haskell2010
+  ghc-options:        -Wall
+                      -Wincomplete-record-updates
+                      -Wincomplete-uni-patterns
+                      -Wredundant-constraints
+                      -fno-warn-orphans
+                      -threaded
+                      -with-rtsopts=-N2
+
+benchmark bench
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      bench
+  main-is:             Bench.hs
+  ghc-options:         -Wall
+                       -threaded
+                       -O2
+                       -with-rtsopts=-N
+  build-depends:       base
+                     , criterion
+                     , Color
+                     , colour
+                     , deepseq
+                     , random
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/lehins/{{name}}
+
+{-# START_FILE Setup.hs #-}
+{-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -Wall #-}
+module Main (main) where
+
+#ifndef MIN_VERSION_cabal_doctest
+#define MIN_VERSION_cabal_doctest(x,y,z) 0
+#endif
+
+#if MIN_VERSION_cabal_doctest(1,0,0)
+
+import Distribution.Extra.Doctest ( defaultMainWithDoctests )
+main :: IO ()
+main = defaultMainWithDoctests "doctests"
+
+#else
+
+#ifdef MIN_VERSION_Cabal
+-- If the macro is defined, we have new cabal-install,
+-- but for some reason we don't have cabal-doctest in package-db
+--
+-- Probably we are running cabal sdist, when otherwise using new-build
+-- workflow
+#warning You are configuring this package without cabal-doctest installed. \
+         The doctests test-suite will not work as a result. \
+         To fix this, install cabal-doctest before configuring.
+#endif
+
+import Distribution.Simple
+
+main :: IO ()
+main = defaultMain
+
+#endif
+
+
+{-# START_FILE src/Lib.hs #-}
+-- |
+-- Module      : Lib
+-- Copyright   : (c) Alexey Kuleshevich 2020
+-- License     : BSD3
+-- Maintainer  : Alexey Kuleshevich <alexey@kuleshevi.ch>
+-- Stability   : experimental
+-- Portability : non-portable
+--
+module Lib
+    ( someFunc
+    ) where
+
+someFunc :: IO ()
+someFunc = putStrLn "someFunc"
+
+{-# START_FILE tests/Spec.hs #-}
+{-# OPTIONS_GHC -F -pgmF hspec-discover -optF --no-main #-}
+
+{-# START_FILE tests/Main.hs #-}
+module Main where
+
+import Spec
+import System.IO (BufferMode (LineBuffering), hSetBuffering, hSetEncoding, stdout, utf8)
+import Test.Hspec
+
+main :: IO ()
+main = do
+  hSetBuffering stdout LineBuffering
+  hSetEncoding stdout utf8
+  hspec spec
+
+{-# START_FILE tests/Common.hs #-}
+module Common
+  ( module X
+  ) where
+
+import Test.Hspec as X
+import Test.QuickCheck as X
+
+{-# START_FILE tests/LibSpec.hs #-}
+module LibSpec (spec) where
+
+import Common
+
+spec :: Spec
+spec = do
+  describe "someFunc" $ do
+    xit "DoesSomething" $ property $ \ a@() -> () === a
+
+
+{-# START_FILE app/Main.hs #-}
+module Main where
+
+import Lib
+
+main :: IO ()
+main = someFunc
+
+{-# START_FILE bench/Bench.hs #-}
+module Main where
+
+import Criterion.Main
+import Lib
+
+main :: IO ()
+main = do
+  defaultMain
+    [ bgroup "Bench"
+      [ bench "someFunc" $ nfIO someFunc
+      ]
+    ]
+
+{-# START_FILE README.md #-}
+# {{name}}
+
+{-# START_FILE CHANGELOG.md #-}
+# Changelog for {{name}}
+
+## 0.1.0.0
+
+* Initial release
+
+{-# START_FILE LICENSE #-}
+Copyright Alexey Kuleshevich (c) {{year}}{{^year}}2020{{/year}}
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Alexey Kuleshevich nor the names of other
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+{-# START_FILE .gitignore #-}
+.stack-work*
+*~
