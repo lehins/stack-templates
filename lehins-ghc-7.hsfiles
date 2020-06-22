@@ -10,7 +10,7 @@ author:              Alexey Kuleshevich
 maintainer:          alexey@kuleshevi.ch
 copyright:           {{year}}{{^year}}2020{{/year}} Alexey Kuleshevich
 category:            Algorithms
-build-type:          Custom
+build-type:          Simple
 extra-source-files:  README.md
                    , CHANGELOG.md
 cabal-version:       1.18
@@ -25,11 +25,6 @@ tested-with:         GHC == 7.10.3
                    , GHC == 8.8.1
                    , GHC == 8.8.2
                    , GHC == 8.10.1
-custom-setup
-  setup-depends:
-      base
-    , Cabal
-    , cabal-doctest >=1.0.6
 
 library
   hs-source-dirs:      src
@@ -105,33 +100,6 @@ source-repository head
   location: https://github.com/lehins/{{name}}
 
 {-# START_FILE Setup.hs #-}
-{-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -Wall #-}
-module Main (main) where
-
-#ifndef MIN_VERSION_cabal_doctest
-#define MIN_VERSION_cabal_doctest(x,y,z) 0
-#endif
-
-#if MIN_VERSION_cabal_doctest(1,0,0)
-
-import Distribution.Extra.Doctest ( defaultMainWithDoctests )
-main :: IO ()
-main = defaultMainWithDoctests "doctests"
-
-#else
-
-#ifdef MIN_VERSION_Cabal
--- If the macro is defined, we have new cabal-install,
--- but for some reason we don't have cabal-doctest in package-db
---
--- Probably we are running cabal sdist, when otherwise using new-build
--- workflow
-#warning You are configuring this package without cabal-doctest installed. \
-         The doctests test-suite will not work as a result. \
-         To fix this, install cabal-doctest before configuring.
-#endif
-
 import Distribution.Simple
 
 main :: IO ()
@@ -190,6 +158,13 @@ spec = do
   describe "someFunc" $ do
     xit "DoesSomething" $ property $ \ a@() -> () === a
 
+{-# START_FILE tests/doctests.hs #-}
+module Main where
+
+import Test.DocTest (doctest)
+
+main :: IO ()
+main = doctest ["src"]
 
 {-# START_FILE app/Main.hs #-}
 module Main where
@@ -217,7 +192,7 @@ main = do
 # {{name}}
 
 {-# START_FILE CHANGELOG.md #-}
-# Changelog for {{name}}
+# Changelog for `{{name}}`
 
 ## 0.1.0.0
 
