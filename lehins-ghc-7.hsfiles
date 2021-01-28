@@ -8,7 +8,7 @@ license:             BSD3
 license-file:        LICENSE
 author:              Alexey Kuleshevich
 maintainer:          alexey@kuleshevi.ch
-copyright:           {{year}}{{^year}}2020{{/year}} Alexey Kuleshevich
+copyright:           {{year}}{{^year}}2021{{/year}} Alexey Kuleshevich
 category:            Algorithms
 build-type:          Simple
 extra-source-files:  README.md
@@ -111,7 +111,7 @@ main = defaultMain
 {-# START_FILE src/Lib.hs #-}
 -- |
 -- Module      : Lib
--- Copyright   : (c) Alexey Kuleshevich 2020
+-- Copyright   : (c) Alexey Kuleshevich 2021
 -- License     : BSD3
 -- Maintainer  : Alexey Kuleshevich <alexey@kuleshevi.ch>
 -- Stability   : experimental
@@ -199,7 +199,7 @@ main = do
 * Initial release
 
 {-# START_FILE LICENSE #-}
-Copyright Alexey Kuleshevich (c) {{year}}{{^year}}2020{{/year}}
+Copyright Alexey Kuleshevich (c) {{year}}{{^year}}2021{{/year}}
 
 All rights reserved.
 
