@@ -8,7 +8,7 @@ license:             BSD3
 license-file:        LICENSE
 author:              Alexey Kuleshevich
 maintainer:          alexey@kuleshevi.ch
-copyright:           {{year}}{{^year}}2021{{/year}} Alexey Kuleshevich
+copyright:           {{year}}{{^year}}2022{{/year}} Alexey Kuleshevich
 category:            Algorithms
 build-type:          Simple
 extra-source-files:  README.md
@@ -75,6 +75,7 @@ test-suite tests
   other-modules:      Common
                     , LibSpec
                     , Spec
+  build-tool-depends: hspec-discover:hspec-discover
   build-depends:      base
                     , {{name}}
                     , hspec
@@ -117,7 +118,7 @@ main = defaultMain
 {-# START_FILE src/Lib.hs #-}
 -- |
 -- Module      : Lib
--- Copyright   : (c) Alexey Kuleshevich 2021
+-- Copyright   : (c) Alexey Kuleshevich 2022
 -- License     : BSD3
 -- Maintainer  : Alexey Kuleshevich <alexey@kuleshevi.ch>
 -- Stability   : experimental
@@ -215,7 +216,7 @@ main = do
 * Initial release
 
 {-# START_FILE LICENSE #-}
-Copyright Alexey Kuleshevich (c) {{year}}{{^year}}2021{{/year}}
+Copyright Alexey Kuleshevich (c) {{year}}{{^year}}2022{{/year}}
 
 All rights reserved.
 
