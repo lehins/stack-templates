@@ -104,9 +104,6 @@ import Distribution.Simple
 main :: IO ()
 main = defaultMain
 
-#endif
-
-
 {-# START_FILE src/Lib.hs #-}
 -- |
 -- Module      : Lib
